@@ -98,9 +98,8 @@ class DRW(nn.Module):
         super(DRW, self).__init__()
         self.edge_features = edge_features
 
-        self.w1 = nn.Parameter(torch.FloatTensor(edge_features, 500))
-        self.w2 = nn.Parameter(torch.FloatTensor(500, 50))
-        self.w3 = nn.Parameter(torch.FloatTensor(50, 1))
+        self.w1 = nn.Parameter(torch.FloatTensor(edge_features, 100))
+        self.w2 = nn.Parameter(torch.FloatTensor(100, 1))
 
         self.reset_parameters()
 
@@ -111,13 +110,12 @@ class DRW(nn.Module):
         stdv = 1. / math.sqrt(self.w2.size(1))
         self.w2.data.uniform_(-stdv, stdv)
 
-        stdv = 1. / math.sqrt(self.w3.size(1))
-        self.w3.data.uniform_(-stdv, stdv)
+        #stdv = 1. / math.sqrt(self.w3.size(1))
+        #self.w3.data.uniform_(-stdv, stdv)
 
     def forward(self, E):
         E = F.relu(torch.spmm(E, self.w1))
-        E = F.relu(torch.spmm(E, self.w2))
-        E = torch.spmm(E, self.w3)
+        E = torch.spmm(E, self.w2)
         return E
 
     def __repr__(self):

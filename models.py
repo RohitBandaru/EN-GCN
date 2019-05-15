@@ -3,13 +3,13 @@ import torch.nn.functional as F
 from layers import *
 
 class IPW_Net(nn.Module):
-    def __init__(self, d_node, d_edge, n_classes):
+    def __init__(self, d_node, d_edge, n_classes, hidden_units):
         super(IPW_Net, self).__init__()
         self.d_node = d_node
         self.d_edge = d_edge
 
-        self.ipw1 = IPW(d_node, 100, d_edge)
-        self.ipw2 = IPW(100, n_classes, d_edge)
+        self.ipw1 = IPW(d_node, hidden_units, d_edge)
+        self.ipw2 = IPW(hidden_units, n_classes, d_edge)
 
     def forward(self, H, A, E):
         H = F.relu(self.ipw1(H,A,E))
@@ -18,13 +18,13 @@ class IPW_Net(nn.Module):
         return F.log_softmax(H, dim=1)
 
 class CPW_Net(nn.Module):
-    def __init__(self, d_node, d_edge, n_classes):
+    def __init__(self, d_node, d_edge, n_classes, hidden_units):
         super(CPW_Net, self).__init__()
         self.d_node = d_node
         self.d_edge = d_edge
 
-        self.cpw1 = CPW(d_node, 100, d_edge, 100)
-        self.ipw = IPW(100, n_classes, 100)
+        self.cpw1 = CPW(d_node, hidden_units, d_edge, hidden_units)
+        self.ipw = IPW(hidden_units, n_classes, hidden_units)
 
     def forward(self, H, A, E):
         H, E = self.cpw1(H,A,E)
@@ -33,12 +33,12 @@ class CPW_Net(nn.Module):
         return F.log_softmax(H, dim=1)
 
 class DRW_Net(nn.Module):
-    def __init__(self, d_node, d_edge, n_classes):
+    def __init__(self, d_node, d_edge, n_classes, hidden_units):
         super(DRW_Net, self).__init__()
         self.d_node = d_node
 
-        self.gcn1 = GCN(d_node, 100)
-        self.gcn2 = GCN(100, n_classes)
+        self.gcn1 = GCN(d_node, hidden_units)
+        self.gcn2 = GCN(hidden_units, n_classes)
 
         self.drw = DRW(d_edge)
 
@@ -52,12 +52,12 @@ class DRW_Net(nn.Module):
         return F.log_softmax(H, dim=1)
 
 class GCN_Net(nn.Module):
-    def __init__(self, d_node, n_classes):
+    def __init__(self, d_node, n_classes, hidden_units):
         super(GCN_Net, self).__init__()
         self.d_node = d_node
 
-        self.gcn1 = GCN(d_node, 100)
-        self.gcn2 = GCN(100, n_classes)
+        self.gcn1 = GCN(d_node, hidden_units)
+        self.gcn2 = GCN(hidden_units, n_classes)
 
     def forward(self, H, A, E):
         H = F.relu(self.gcn1(H,A,E))

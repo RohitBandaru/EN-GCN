@@ -29,6 +29,7 @@ def load_data(path="data/cora/", dataset="cora"):
     idx_map = {j: i for i, j in enumerate(idx)}
     edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset),
                                     dtype=np.int32)
+    print(edges_unordered)
     edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                      dtype=np.int32).reshape(edges_unordered.shape)
     adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
@@ -140,3 +141,4 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     values = torch.from_numpy(sparse_mx.data)
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
+print(load_data("data/citeseer/", "citeseer"))
